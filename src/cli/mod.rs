@@ -22,11 +22,11 @@ pub struct Cli {
     /// Enable verbose output
     #[arg(short, long, global = true)]
     pub verbose: bool,
-    
+
     /// Output format: json, table, compact
     #[arg(short, long, global = true)]
     pub format: Option<String>,
-    
+
     #[command(subcommand)]
     pub command: Commands,
 }
@@ -35,26 +35,25 @@ pub struct Cli {
 pub enum Commands {
     /// List and manage zones (domains)
     Zones(zones::ZonesArgs),
-    
+
     /// Manage DNS records
     Dns(dns::DnsArgs),
-    
+
     /// Manage zone settings
     Settings(settings::SettingsArgs),
-    
+
     /// Manage firewall rules
     Firewall(firewall::FirewallArgs),
-    
+
     /// Cache management
     Cache(cache::CacheArgs),
-    
+
     /// Analytics and logs (GraphQL)
     Analytics(analytics::AnalyticsArgs),
-    
+
     /// Raw API requests
     Raw(raw::RawArgs),
-    
+
     /// Configuration management
     Config(config_cmd::ConfigArgs),
 }
-

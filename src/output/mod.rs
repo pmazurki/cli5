@@ -37,7 +37,7 @@ pub fn print_compact<T: Serialize>(data: &T) -> Result<()> {
 
 fn print_value_compact(value: &Value, indent: usize) {
     let prefix = "  ".repeat(indent);
-    
+
     match value {
         Value::Object(map) => {
             for (key, val) in map {
@@ -67,11 +67,13 @@ fn print_value_compact(value: &Value, indent: usize) {
 fn format_value(value: &Value) -> String {
     match value {
         Value::Null => "null".dimmed().to_string(),
-        Value::Bool(b) => if *b { 
-            "true".green().to_string() 
-        } else { 
-            "false".red().to_string() 
-        },
+        Value::Bool(b) => {
+            if *b {
+                "true".green().to_string()
+            } else {
+                "false".red().to_string()
+            }
+        }
         Value::Number(n) => n.to_string().yellow().to_string(),
         Value::String(s) => s.clone(),
         _ => value.to_string(),
@@ -112,22 +114,28 @@ pub fn print_dns_record(record: &Value) {
     let id = record.get("id").and_then(|v| v.as_str()).unwrap_or("-");
     let rtype = record.get("type").and_then(|v| v.as_str()).unwrap_or("-");
     let name = record.get("name").and_then(|v| v.as_str()).unwrap_or("-");
-    let content = record.get("content").and_then(|v| v.as_str()).unwrap_or("-");
-    let proxied = record.get("proxied").and_then(|v| v.as_bool()).unwrap_or(false);
+    let content = record
+        .get("content")
+        .and_then(|v| v.as_str())
+        .unwrap_or("-");
+    let proxied = record
+        .get("proxied")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
     let ttl = record.get("ttl").and_then(|v| v.as_u64()).unwrap_or(0);
-    
+
     let proxied_str = if proxied {
         "●".bright_yellow().to_string()
     } else {
         "○".dimmed().to_string()
     };
-    
-    let ttl_str = if ttl == 1 { 
-        "Auto".to_string() 
-    } else { 
-        format!("{}s", ttl) 
+
+    let ttl_str = if ttl == 1 {
+        "Auto".to_string()
+    } else {
+        format!("{}s", ttl)
     };
-    
+
     println!(
         "{}\t{}\t{}\t{}\t{}\t{}",
         rtype.cyan(),
@@ -149,14 +157,14 @@ pub fn print_zone(zone: &Value) {
         .and_then(|v| v.get("name"))
         .and_then(|v| v.as_str())
         .unwrap_or("-");
-    
+
     let status_colored = match status {
         "active" => status.green().to_string(),
         "pending" => status.yellow().to_string(),
         "moved" => status.red().to_string(),
         _ => status.to_string(),
     };
-    
+
     println!(
         "{}\t{}\t{}\t{}",
         name.bold(),
@@ -178,14 +186,14 @@ pub fn print_firewall_rule(rule: &Value) {
     let config = rule.get("configuration").unwrap_or(&Value::Null);
     let target = config.get("target").and_then(|v| v.as_str()).unwrap_or("-");
     let value = config.get("value").and_then(|v| v.as_str()).unwrap_or("-");
-    
+
     let mode_colored = match mode {
         "block" => mode.red().to_string(),
         "challenge" | "js_challenge" => mode.yellow().to_string(),
         "whitelist" | "allow" => mode.green().to_string(),
         _ => mode.to_string(),
     };
-    
+
     println!(
         "{}\t{}\t{}\t{}\t{}",
         mode_colored,
@@ -207,11 +215,6 @@ pub fn print_analytics_row(count: u64, dimensions: &Value) {
                 .collect()
         })
         .unwrap_or_default();
-    
-    println!(
-        "{}\t{}",
-        count.to_string().yellow().bold(),
-        dims.join("\t")
-    );
-}
 
+    println!("{}\t{}", count.to_string().yellow().bold(), dims.join("\t"));
+}

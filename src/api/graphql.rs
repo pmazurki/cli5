@@ -10,10 +10,8 @@ pub fn http_requests_query(
     filter: Option<&str>,
 ) -> String {
     let dims = dimensions.join(" ");
-    let filter_clause = filter
-        .map(|f| format!(", {}", f))
-        .unwrap_or_default();
-    
+    let filter_clause = filter.map(|f| format!(", {}", f)).unwrap_or_default();
+
     format!(
         r#"{{
   viewer {{
@@ -35,11 +33,7 @@ pub fn http_requests_query(
 }
 
 /// Build a GraphQL query for firewall events
-pub fn firewall_events_query(
-    zone_id: &str,
-    since: &str,
-    limit: u32,
-) -> String {
+pub fn firewall_events_query(zone_id: &str, since: &str, limit: u32) -> String {
     format!(
         r#"{{
   viewer {{
@@ -115,14 +109,7 @@ pub fn errors_query(zone_id: &str, since: &str, limit: u32) -> String {
 
 /// Build query for cache status
 pub fn cache_status_query(zone_id: &str, since: &str, limit: u32) -> String {
-    http_requests_query(
-        zone_id,
-        since,
-        limit,
-        &["cacheStatus"],
-        "count_DESC",
-        None,
-    )
+    http_requests_query(zone_id, since, limit, &["cacheStatus"], "count_DESC", None)
 }
 
 /// Build query for bandwidth by content type
@@ -187,4 +174,3 @@ pub fn hourly_traffic_query(zone_id: &str, since: &str) -> String {
 }}"#
     )
 }
-

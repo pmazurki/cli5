@@ -37,4 +37,3 @@ pub struct ResultInfo {
     pub count: Option<u32>,
     pub total_count: Option<u32>,
 }
-

@@ -12,15 +12,15 @@ use crate::output;
 pub struct RawArgs {
     /// API path (e.g., /zones, /zones/:zone_id/dns_records)
     pub path: String,
-    
+
     /// HTTP method
     #[arg(short, long, default_value = "GET")]
     pub method: String,
-    
+
     /// Request body (JSON)
     #[arg(short, long)]
     pub body: Option<String>,
-    
+
     /// Zone placeholder replacement
     #[arg(short, long)]
     pub zone: Option<String>,
@@ -28,26 +28,29 @@ pub struct RawArgs {
 
 pub async fn execute(config: &Config, args: RawArgs) -> Result<()> {
     let client = CloudflareClient::new(config.clone())?;
-    
+
     // Replace :zone_id placeholder if zone is provided
     let mut path = args.path.clone();
     if path.contains(":zone_id") || path.contains("{zone_id}") {
         let zone = config.resolve_zone(args.zone.as_deref())?;
         let zone_id = client.resolve_zone_id(&zone).await?;
-        path = path.replace(":zone_id", &zone_id).replace("{zone_id}", &zone_id);
+        path = path
+            .replace(":zone_id", &zone_id)
+            .replace("{zone_id}", &zone_id);
     }
-    
+
     // Ensure path starts with /
     if !path.starts_with('/') {
         path = format!("/{}", path);
     }
-    
+
     let method = args.method.to_uppercase();
-    
+
     let response = match method.as_str() {
         "GET" => client.get_raw(&path).await?,
         "POST" => {
-            let body: Value = args.body
+            let body: Value = args
+                .body
                 .as_ref()
                 .map(|b| serde_json::from_str(b))
                 .transpose()?
@@ -55,7 +58,8 @@ pub async fn execute(config: &Config, args: RawArgs) -> Result<()> {
             client.post_raw(&path, body).await?
         }
         "PUT" => {
-            let body: Value = args.body
+            let body: Value = args
+                .body
                 .as_ref()
                 .map(|b| serde_json::from_str(b))
                 .transpose()?
@@ -63,7 +67,8 @@ pub async fn execute(config: &Config, args: RawArgs) -> Result<()> {
             client.put_raw(&path, body).await?
         }
         "PATCH" => {
-            let body: Value = args.body
+            let body: Value = args
+                .body
                 .as_ref()
                 .map(|b| serde_json::from_str(b))
                 .transpose()?
@@ -76,9 +81,8 @@ pub async fn execute(config: &Config, args: RawArgs) -> Result<()> {
             return Ok(());
         }
     };
-    
+
     output::print_output(&response, &config.output_format)?;
-    
+
     Ok(())
 }
-

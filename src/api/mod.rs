@@ -6,4 +6,3 @@ pub mod graphql;
 pub mod response;
 
 pub use client::CloudflareClient;
-

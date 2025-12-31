@@ -1,5 +1,5 @@
 //! CLI5 - Modern Cloudflare CLI in Rust
-//! 
+//!
 //! Supports both REST API and GraphQL API with dynamic endpoint configuration.
 
 mod api;
@@ -43,4 +43,3 @@ async fn main() -> Result<()> {
         Commands::Config(args) => cli::config_cmd::execute(&config, args).await,
     }
 }
-

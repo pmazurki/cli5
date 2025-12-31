@@ -100,19 +100,19 @@ impl EndpointRegistry {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     /// Load all endpoint definitions from a directory
     pub fn load_from_dir(dir: &Path) -> Result<Self> {
         let mut registry = Self::new();
-        
+
         if !dir.exists() {
             return Ok(registry);
         }
-        
+
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            
+
             if path.extension().map(|e| e == "json").unwrap_or(false) {
                 match registry.load_file(&path) {
                     Ok(_) => tracing::debug!("Loaded endpoints from {:?}", path),
@@ -120,47 +120,47 @@ impl EndpointRegistry {
                 }
             }
         }
-        
+
         Ok(registry)
     }
-    
+
     /// Load endpoints from a single JSON file
     pub fn load_file(&mut self, path: &Path) -> Result<()> {
         let content = fs::read_to_string(path)?;
         let group: EndpointGroup = serde_json::from_str(&content)?;
-        
+
         for endpoint in group.endpoints {
             let category = if endpoint.category.is_empty() {
                 group.name.clone()
             } else {
                 endpoint.category.clone()
             };
-            
+
             // Add to category index
             self.by_category
                 .entry(category)
                 .or_default()
                 .push(endpoint.name.clone());
-            
+
             // Add to main registry
             self.endpoints.insert(endpoint.name.clone(), endpoint);
         }
-        
+
         Ok(())
     }
-    
+
     /// Get endpoint by name
     #[allow(dead_code)]
     pub fn get(&self, name: &str) -> Option<&Endpoint> {
         self.endpoints.get(name)
     }
-    
+
     /// List all endpoint names
     #[allow(dead_code)]
     pub fn list(&self) -> Vec<&str> {
         self.endpoints.keys().map(|s| s.as_str()).collect()
     }
-    
+
     /// List endpoints by category
     pub fn list_by_category(&self, category: &str) -> Vec<&Endpoint> {
         self.by_category
@@ -173,17 +173,17 @@ impl EndpointRegistry {
             })
             .unwrap_or_default()
     }
-    
+
     /// List all categories
     pub fn categories(&self) -> Vec<&str> {
         self.by_category.keys().map(|s| s.as_str()).collect()
     }
-    
+
     /// Build path with parameters substituted
     #[allow(dead_code)]
     pub fn build_path(endpoint: &Endpoint, params: &HashMap<String, String>) -> Result<String> {
         let mut path = endpoint.path.clone();
-        
+
         // Substitute path parameters
         for param in &endpoint.params {
             if param.location == "path" {
@@ -195,21 +195,19 @@ impl EndpointRegistry {
                 }
             }
         }
-        
+
         // Add query parameters
         let query_params: Vec<String> = endpoint
             .params
             .iter()
             .filter(|p| p.location == "query")
-            .filter_map(|p| {
-                params.get(&p.name).map(|v| format!("{}={}", p.name, v))
-            })
+            .filter_map(|p| params.get(&p.name).map(|v| format!("{}={}", p.name, v)))
             .collect();
-        
+
         if !query_params.is_empty() {
             path = format!("{}?{}", path, query_params.join("&"));
         }
-        
+
         Ok(path)
     }
 }
@@ -219,4 +217,3 @@ pub fn load_registry() -> Result<EndpointRegistry> {
     let endpoints_dir = Config::endpoints_dir()?;
     EndpointRegistry::load_from_dir(&endpoints_dir)
 }
-
