@@ -1,0 +1,151 @@
+{
+  "name": "firewall",
+  "description": "Cloudflare Firewall API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "firewall_access_rules_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/firewall/access_rules/rules",
+      "description": "List IP access rules for a zone",
+      "category": "firewall",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "mode",
+          "description": "Filter by mode (block, challenge, whitelist, js_challenge)",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        },
+        {
+          "name": "notes",
+          "description": "Filter by notes (contains)",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        }
+      ]
+    },
+    {
+      "name": "firewall_access_rule_create",
+      "method": "POST",
+      "path": "/zones/{zone_id}/firewall/access_rules/rules",
+      "description": "Create a new IP access rule",
+      "category": "firewall",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "mode",
+          "description": "Rule mode: block, challenge, whitelist, js_challenge",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "configuration",
+          "description": "Rule configuration object with target and value",
+          "type": "object",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "notes",
+          "description": "Optional notes/reason for the rule",
+          "type": "string",
+          "required": false,
+          "location": "body"
+        }
+      ],
+      "examples": [
+        "cli5 firewall block-ip 1.2.3.4 --note 'Spam' --zone example.com",
+        "cli5 firewall block-country RU --note 'Block Russia' --zone example.com"
+      ]
+    },
+    {
+      "name": "firewall_access_rule_delete",
+      "method": "DELETE",
+      "path": "/zones/{zone_id}/firewall/access_rules/rules/{rule_id}",
+      "description": "Delete an IP access rule",
+      "category": "firewall",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "rule_id",
+          "description": "Access rule identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "firewall_rules_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/firewall/rules",
+      "description": "List firewall rules",
+      "category": "firewall",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "waf_packages_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/firewall/waf/packages",
+      "description": "List WAF packages (Pro+)",
+      "category": "firewall",
+      "required_plan": "pro",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "security_events",
+      "method": "GET",
+      "path": "/zones/{zone_id}/security/events",
+      "description": "Get security events",
+      "category": "firewall",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    }
+  ]
+}
+

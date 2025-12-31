@@ -1,0 +1,217 @@
+{
+  "name": "dns",
+  "description": "Cloudflare DNS Records API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "dns_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/dns_records",
+      "description": "List DNS records for a zone",
+      "category": "dns",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "type",
+          "description": "Record type filter (A, AAAA, CNAME, etc.)",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        },
+        {
+          "name": "name",
+          "description": "Record name filter",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        },
+        {
+          "name": "content",
+          "description": "Record content filter",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        }
+      ],
+      "examples": [
+        "cli5 dns list --zone example.com",
+        "cli5 dns list --zone example.com --type A"
+      ]
+    },
+    {
+      "name": "dns_get",
+      "method": "GET",
+      "path": "/zones/{zone_id}/dns_records/{record_id}",
+      "description": "Get a specific DNS record",
+      "category": "dns",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "record_id",
+          "description": "DNS record identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "dns_create",
+      "method": "POST",
+      "path": "/zones/{zone_id}/dns_records",
+      "description": "Create a new DNS record",
+      "category": "dns",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "type",
+          "description": "Record type (A, AAAA, CNAME, TXT, MX, etc.)",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "name",
+          "description": "Record name (e.g., 'www' or 'subdomain.example.com')",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "content",
+          "description": "Record content (IP, hostname, etc.)",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "proxied",
+          "description": "Enable Cloudflare proxy",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "location": "body"
+        },
+        {
+          "name": "ttl",
+          "description": "TTL in seconds (1 = auto)",
+          "type": "number",
+          "required": false,
+          "default": 1,
+          "location": "body"
+        },
+        {
+          "name": "priority",
+          "description": "Priority (for MX/SRV records)",
+          "type": "number",
+          "required": false,
+          "location": "body"
+        }
+      ],
+      "examples": [
+        "cli5 dns add www A 1.2.3.4 --zone example.com",
+        "cli5 dns add mail MX mail.example.com --priority 10 --zone example.com"
+      ]
+    },
+    {
+      "name": "dns_update",
+      "method": "PUT",
+      "path": "/zones/{zone_id}/dns_records/{record_id}",
+      "description": "Update an existing DNS record",
+      "category": "dns",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "record_id",
+          "description": "DNS record identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "type",
+          "description": "Record type",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "name",
+          "description": "Record name",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "content",
+          "description": "Record content",
+          "type": "string",
+          "required": true,
+          "location": "body"
+        },
+        {
+          "name": "proxied",
+          "description": "Enable Cloudflare proxy",
+          "type": "boolean",
+          "required": false,
+          "location": "body"
+        },
+        {
+          "name": "ttl",
+          "description": "TTL in seconds",
+          "type": "number",
+          "required": false,
+          "location": "body"
+        }
+      ]
+    },
+    {
+      "name": "dns_delete",
+      "method": "DELETE",
+      "path": "/zones/{zone_id}/dns_records/{record_id}",
+      "description": "Delete a DNS record",
+      "category": "dns",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "record_id",
+          "description": "DNS record identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    }
+  ]
+}
+

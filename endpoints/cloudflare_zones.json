@@ -1,0 +1,184 @@
+{
+  "name": "zones",
+  "description": "Cloudflare Zones API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "zones_list",
+      "method": "GET",
+      "path": "/zones",
+      "description": "List all zones (domains) in the account",
+      "category": "zones",
+      "params": [
+        {
+          "name": "name",
+          "description": "Filter by zone name",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        },
+        {
+          "name": "status",
+          "description": "Filter by status (active, pending, etc.)",
+          "type": "string",
+          "required": false,
+          "location": "query"
+        },
+        {
+          "name": "page",
+          "description": "Page number",
+          "type": "number",
+          "required": false,
+          "default": 1,
+          "location": "query"
+        },
+        {
+          "name": "per_page",
+          "description": "Results per page (max 50)",
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "location": "query"
+        }
+      ],
+      "examples": [
+        "cli5 zones list",
+        "cli5 zones list --status active"
+      ]
+    },
+    {
+      "name": "zone_get",
+      "method": "GET",
+      "path": "/zones/{zone_id}",
+      "description": "Get zone details",
+      "category": "zones",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "zone_purge_cache",
+      "method": "POST",
+      "path": "/zones/{zone_id}/purge_cache",
+      "description": "Purge zone cache",
+      "category": "cache",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "purge_everything",
+          "description": "Purge all cached content",
+          "type": "boolean",
+          "required": false,
+          "location": "body"
+        },
+        {
+          "name": "files",
+          "description": "Array of URLs to purge",
+          "type": "array",
+          "required": false,
+          "location": "body"
+        },
+        {
+          "name": "tags",
+          "description": "Array of cache tags to purge (Enterprise)",
+          "type": "array",
+          "required": false,
+          "location": "body"
+        },
+        {
+          "name": "hosts",
+          "description": "Array of hostnames to purge",
+          "type": "array",
+          "required": false,
+          "location": "body"
+        }
+      ],
+      "examples": [
+        "cli5 cache purge-all --zone example.com",
+        "cli5 cache purge-urls https://example.com/style.css --zone example.com"
+      ]
+    },
+    {
+      "name": "zone_settings_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/settings",
+      "description": "List all zone settings",
+      "category": "settings",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "zone_setting_get",
+      "method": "GET",
+      "path": "/zones/{zone_id}/settings/{setting_id}",
+      "description": "Get a specific zone setting",
+      "category": "settings",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "setting_id",
+          "description": "Setting identifier (e.g., ssl, always_use_https)",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "zone_setting_update",
+      "method": "PATCH",
+      "path": "/zones/{zone_id}/settings/{setting_id}",
+      "description": "Update a zone setting",
+      "category": "settings",
+      "params": [
+        {
+          "name": "zone_id",
+          "description": "Zone identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "setting_id",
+          "description": "Setting identifier",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "value",
+          "description": "New setting value",
+          "type": "any",
+          "required": true,
+          "location": "body"
+        }
+      ]
+    }
+  ]
+}
+
