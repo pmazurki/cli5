@@ -39,7 +39,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # GraphQL
-graphql_client = "0.14"
+graphql_client = "0.15"
 
 # Utils
 once_cell = "1.20"
