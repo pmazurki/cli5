@@ -234,31 +234,3 @@ pub async fn execute(config: &Config, args: DnsArgs) -> Result<()> {
     Ok(())
 }
 
-// Helper trait to add post_raw, put_raw, delete_raw to client
-impl CloudflareClient {
-    pub async fn post_raw(
-        &self,
-        path: &str,
-        body: serde_json::Value,
-    ) -> Result<serde_json::Value, anyhow::Error> {
-        use crate::api::response::ApiResponse;
-        let response: ApiResponse<serde_json::Value> = self.post(path, body).await?;
-        Ok(serde_json::json!({"result": response.result}))
-    }
-
-    pub async fn put_raw(
-        &self,
-        path: &str,
-        body: serde_json::Value,
-    ) -> Result<serde_json::Value, anyhow::Error> {
-        use crate::api::response::ApiResponse;
-        let response: ApiResponse<serde_json::Value> = self.put(path, body).await?;
-        Ok(serde_json::json!({"result": response.result}))
-    }
-
-    pub async fn delete_raw(&self, path: &str) -> Result<serde_json::Value, anyhow::Error> {
-        use crate::api::response::ApiResponse;
-        let response: ApiResponse<serde_json::Value> = self.delete(path).await?;
-        Ok(serde_json::json!({"result": response.result}))
-    }
-}

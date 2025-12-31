@@ -6,8 +6,11 @@ pub mod cache;
 pub mod config_cmd;
 pub mod dns;
 pub mod firewall;
+pub mod pages;
 pub mod raw;
 pub mod settings;
+pub mod ssl;
+pub mod workers;
 pub mod zones;
 
 use clap::{Parser, Subcommand};
@@ -49,8 +52,17 @@ pub enum Commands {
     /// Cache management
     Cache(cache::CacheArgs),
 
+    /// SSL/TLS settings
+    Ssl(ssl::SslArgs),
+
     /// Analytics and logs (GraphQL)
     Analytics(analytics::AnalyticsArgs),
+
+    /// Cloudflare Workers
+    Workers(workers::WorkersArgs),
+
+    /// Cloudflare Pages
+    Pages(pages::PagesArgs),
 
     /// Workers AI - chat, translate, summarize
     Ai(ai::AiArgs),

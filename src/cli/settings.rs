@@ -257,15 +257,3 @@ pub async fn execute(config: &Config, args: SettingsArgs) -> Result<()> {
     Ok(())
 }
 
-// Add patch_raw helper
-impl CloudflareClient {
-    pub async fn patch_raw(
-        &self,
-        path: &str,
-        body: serde_json::Value,
-    ) -> Result<serde_json::Value, anyhow::Error> {
-        use crate::api::response::ApiResponse;
-        let response: ApiResponse<serde_json::Value> = self.patch(path, body).await?;
-        Ok(serde_json::json!({"result": response.result}))
-    }
-}

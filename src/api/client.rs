@@ -226,6 +226,135 @@ impl CloudflareClient {
         Ok(value)
     }
 
+    /// Make a raw POST request (returns Value)
+    pub async fn post_raw(&self, path: &str, body: Value) -> Result<Value> {
+        let url = format!("{}{}", CF_API_BASE, path);
+        debug!("POST (raw) {} with body: {}", url, body);
+
+        let response = self
+            .build_request(Method::POST, &url)
+            .json(&body)
+            .send()
+            .await?;
+
+        let status = response.status();
+        let text = response.text().await?;
+
+        if !status.is_success() {
+            return Err(anyhow!("API error ({}): {}", status, text));
+        }
+
+        let value: Value = serde_json::from_str(&text)?;
+        Ok(value)
+    }
+
+    /// Make a raw PATCH request (returns Value)
+    pub async fn patch_raw(&self, path: &str, body: Value) -> Result<Value> {
+        let url = format!("{}{}", CF_API_BASE, path);
+        debug!("PATCH (raw) {} with body: {}", url, body);
+
+        let response = self
+            .build_request(Method::PATCH, &url)
+            .json(&body)
+            .send()
+            .await?;
+
+        let status = response.status();
+        let text = response.text().await?;
+
+        if !status.is_success() {
+            return Err(anyhow!("API error ({}): {}", status, text));
+        }
+
+        let value: Value = serde_json::from_str(&text)?;
+        Ok(value)
+    }
+
+    /// Make a raw PUT request (returns Value)
+    pub async fn put_raw(&self, path: &str, body: Value) -> Result<Value> {
+        let url = format!("{}{}", CF_API_BASE, path);
+        debug!("PUT (raw) {} with body: {}", url, body);
+
+        let response = self
+            .build_request(Method::PUT, &url)
+            .json(&body)
+            .send()
+            .await?;
+
+        let status = response.status();
+        let text = response.text().await?;
+
+        if !status.is_success() {
+            return Err(anyhow!("API error ({}): {}", status, text));
+        }
+
+        let value: Value = serde_json::from_str(&text)?;
+        Ok(value)
+    }
+
+    /// Make a raw DELETE request (returns Value)
+    pub async fn delete_raw(&self, path: &str) -> Result<Value> {
+        let url = format!("{}{}", CF_API_BASE, path);
+        debug!("DELETE (raw) {}", url);
+
+        let response = self.build_request(Method::DELETE, &url).send().await?;
+
+        let status = response.status();
+        let text = response.text().await?;
+
+        if !status.is_success() {
+            return Err(anyhow!("API error ({}): {}", status, text));
+        }
+
+        let value: Value = serde_json::from_str(&text)?;
+        Ok(value)
+    }
+
+    /// Upload a Worker script (ES modules format)
+    pub async fn put_worker_script(&self, path: &str, script: &str, es_modules: bool) -> Result<Value> {
+        let url = format!("{}{}", CF_API_BASE, path);
+        debug!("PUT worker script to {}", url);
+
+        let mut req = self.client.request(Method::PUT, &url);
+
+        // Add auth headers
+        for (key, value) in self.config.auth_headers() {
+            req = req.header(key, value);
+        }
+
+        if es_modules {
+            // ES modules format requires multipart
+            use reqwest::multipart::{Form, Part};
+
+            let metadata = json!({
+                "main_module": "worker.js",
+                "compatibility_date": "2024-01-01"
+            });
+
+            let form = Form::new()
+                .part("metadata", Part::text(metadata.to_string()).mime_str("application/json")?)
+                .part("worker.js", Part::text(script.to_string()).mime_str("application/javascript+module")?);
+
+            req = req.multipart(form);
+        } else {
+            // Service worker format (legacy)
+            req = req
+                .header("Content-Type", "application/javascript")
+                .body(script.to_string());
+        }
+
+        let response = req.send().await?;
+        let status = response.status();
+        let text = response.text().await?;
+
+        if !status.is_success() {
+            return Err(anyhow!("API error ({}): {}", status, text));
+        }
+
+        let value: Value = serde_json::from_str(&text)?;
+        Ok(value)
+    }
+
     /// Execute a GraphQL query
     pub async fn graphql(&self, query: &str, variables: Option<Value>) -> Result<Value> {
         debug!("GraphQL query: {}", query);
