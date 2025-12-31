@@ -6,7 +6,11 @@ Modern Cloudflare CLI written in Rust. Supports both REST API and GraphQL Analyt
 
 - 🚀 **Fast** - Native Rust binary, async I/O
 - 🔐 **Secure** - API Token or Global API Key authentication
-- 📊 **Analytics** - Full GraphQL Analytics API support (Pro+)
+- 📊 **Analytics** - Full GraphQL Analytics API support
+- 🔒 **SSL/TLS** - Full SSL management with security recommendations
+- 👷 **Workers** - Create, deploy and manage Cloudflare Workers
+- 📄 **Pages** - Manage Cloudflare Pages projects
+- 🤖 **AI** - Chat with Cloudflare Workers AI (Llama, Mistral)
 - 🎨 **Colored output** - Beautiful terminal formatting
 - 📦 **Modular** - Endpoints defined in JSON files
 - 🌍 **Cross-platform** - Linux, macOS (x86_64 & ARM64)
@@ -112,22 +116,95 @@ cli5 cache purge-urls https://example.com/style.css,https://example.com/app.js -
 cli5 cache purge-tags static,images --zone example.com  # Enterprise
 ```
 
-### Analytics (GraphQL - Pro+)
+### SSL/TLS
 
 ```bash
-# Top statistics
-cli5 analytics top-urls --zone example.com --since 24h --limit 20
-cli5 analytics top-ips --zone example.com --since 1h
-cli5 analytics top-countries --zone example.com --since 7d
+# Show status with security recommendations
+cli5 ssl status --zone example.com
 
-# Errors and security
-cli5 analytics errors --zone example.com --since 24h
+# Configure SSL
+cli5 ssl mode strict --zone example.com          # off, flexible, full, strict
+cli5 ssl min-tls 1.2 --zone example.com          # 1.0, 1.1, 1.2, 1.3
+cli5 ssl tls13 on --zone example.com             # Enable TLS 1.3
+cli5 ssl always-https on --zone example.com      # Force HTTPS
+
+# View certificates
+cli5 ssl certs --zone example.com
+```
+
+### Workers
+
+```bash
+# List workers
+cli5 workers list
+
+# Create a simple worker
+cli5 workers create hello-api --message "Hello from my API!"
+
+# Manage routes
+cli5 workers routes --zone example.com
+cli5 workers add-route --zone example.com --pattern "api.example.com/*" --script hello-api
+
+# Delete worker
+cli5 workers delete hello-api
+
+# KV namespaces
+cli5 workers kv
+```
+
+### Pages
+
+```bash
+# List Pages projects
+cli5 pages list
+
+# Create project
+cli5 pages create my-site --branch main
+
+# View project info
+cli5 pages info my-site
+
+# List deployments
+cli5 pages deployments my-site
+
+# Delete project
+cli5 pages delete my-site
+```
+
+### Workers AI
+
+```bash
+# Chat with AI
+cli5 ai chat "What is Cloudflare?"
+cli5 ai chat "Explain DNS" --model @cf/meta/llama-3.2-3b-instruct
+
+# Translate text
+cli5 ai translate "Hello world" --to Polish
+
+# Summarize text
+cli5 ai summarize "Long text to summarize..."
+
+# List available models
+cli5 ai models
+```
+
+### Analytics (GraphQL)
+
+```bash
+# Top statistics (Free: 6h max, Pro+: 7d+)
+cli5 analytics top-urls --zone example.com --since 6h --limit 20
+cli5 analytics top-ips --zone example.com --since 6h
+cli5 analytics top-countries --zone example.com --since 6h
+
+# Errors and performance
+cli5 analytics errors --zone example.com --since 6h
+cli5 analytics cache --zone example.com --since 6h
+cli5 analytics bandwidth --zone example.com --since 6h
+cli5 analytics hourly --zone example.com --since 6h
+cli5 analytics bots --zone example.com --since 6h
+
+# Firewall events (Pro+ only)
 cli5 analytics firewall --zone example.com --since 1h
-
-# Performance
-cli5 analytics cache --zone example.com --since 24h
-cli5 analytics bandwidth --zone example.com --since 7d
-cli5 analytics hourly --zone example.com --since 7d
 
 # Custom GraphQL query
 cli5 analytics query "{ viewer { zones(filter: {zoneTag: \"ZONE_ID\"}) { ... } } }"
