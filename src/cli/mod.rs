@@ -1,5 +1,6 @@
 //! CLI commands module
 
+pub mod ai;
 pub mod analytics;
 pub mod cache;
 pub mod config_cmd;
@@ -50,6 +51,9 @@ pub enum Commands {
 
     /// Analytics and logs (GraphQL)
     Analytics(analytics::AnalyticsArgs),
+
+    /// Workers AI - chat, translate, summarize
+    Ai(ai::AiArgs),
 
     /// Raw API requests
     Raw(raw::RawArgs),

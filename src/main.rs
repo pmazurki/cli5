@@ -39,6 +39,7 @@ async fn main() -> Result<()> {
         Commands::Firewall(args) => cli::firewall::execute(&config, args).await,
         Commands::Cache(args) => cli::cache::execute(&config, args).await,
         Commands::Analytics(args) => cli::analytics::execute(&config, args).await,
+        Commands::Ai(args) => cli::ai::execute(&config, args).await,
         Commands::Raw(args) => cli::raw::execute(&config, args).await,
         Commands::Config(args) => cli::config_cmd::execute(&config, args).await,
     }

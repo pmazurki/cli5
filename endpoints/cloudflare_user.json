@@ -1,0 +1,40 @@
+{
+  "name": "user",
+  "description": "Cloudflare User API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "user_details",
+      "method": "GET",
+      "path": "/user",
+      "description": "Get current user details",
+      "category": "user",
+      "params": []
+    },
+    {
+      "name": "user_tokens_verify",
+      "method": "GET",
+      "path": "/user/tokens/verify",
+      "description": "Verify API token",
+      "category": "user",
+      "params": []
+    },
+    {
+      "name": "user_billing_profile",
+      "method": "GET",
+      "path": "/user/billing/profile",
+      "description": "Get billing profile",
+      "category": "user",
+      "params": []
+    },
+    {
+      "name": "user_subscriptions",
+      "method": "GET",
+      "path": "/user/subscriptions",
+      "description": "List user subscriptions",
+      "category": "user",
+      "params": []
+    }
+  ]
+}
+

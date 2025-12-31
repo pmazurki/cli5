@@ -1,0 +1,80 @@
+{
+  "name": "page_rules",
+  "description": "Cloudflare Page Rules API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "page_rules_list",
+      "method": "GET",
+      "path": "/zones/{zone_id}/pagerules",
+      "description": "List all page rules (3 free, 20 pro)",
+      "category": "page_rules",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "page_rules_create",
+      "method": "POST",
+      "path": "/zones/{zone_id}/pagerules",
+      "description": "Create a new page rule",
+      "category": "page_rules",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "targets",
+          "type": "array",
+          "required": true,
+          "location": "body",
+          "description": "URL pattern targets"
+        },
+        {
+          "name": "actions",
+          "type": "array",
+          "required": true,
+          "location": "body",
+          "description": "Actions to apply"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "default": "active",
+          "location": "body"
+        }
+      ]
+    },
+    {
+      "name": "page_rules_delete",
+      "method": "DELETE",
+      "path": "/zones/{zone_id}/pagerules/{rule_id}",
+      "description": "Delete a page rule",
+      "category": "page_rules",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        },
+        {
+          "name": "rule_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    }
+  ]
+}
+

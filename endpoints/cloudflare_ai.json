@@ -1,0 +1,64 @@
+{
+  "name": "ai",
+  "description": "Cloudflare Workers AI API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "ai_run_llm",
+      "method": "POST",
+      "path": "/accounts/{account_id}/ai/run/{model}",
+      "description": "Run AI inference (LLM, image, speech)",
+      "category": "ai",
+      "params": [
+        {
+          "name": "account_id",
+          "type": "string",
+          "required": true,
+          "location": "path",
+          "description": "Cloudflare account ID"
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true,
+          "location": "path",
+          "description": "Model name (e.g., @cf/meta/llama-3.2-3b-instruct)"
+        },
+        {
+          "name": "messages",
+          "type": "array",
+          "required": true,
+          "location": "body",
+          "description": "Chat messages array"
+        },
+        {
+          "name": "stream",
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "location": "body"
+        }
+      ],
+      "examples": [
+        "cli5 ai chat 'Hello, how are you?'",
+        "cli5 ai --model llama-3.2 chat 'Explain quantum computing'"
+      ]
+    },
+    {
+      "name": "ai_models_list",
+      "method": "GET",
+      "path": "/accounts/{account_id}/ai/models/search",
+      "description": "List available AI models",
+      "category": "ai",
+      "params": [
+        {
+          "name": "account_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    }
+  ]
+}
+

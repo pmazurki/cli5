@@ -1,0 +1,53 @@
+{
+  "name": "ssl",
+  "description": "Cloudflare SSL/TLS API",
+  "version": "v4",
+  "endpoints": [
+    {
+      "name": "ssl_verification",
+      "method": "GET",
+      "path": "/zones/{zone_id}/ssl/verification",
+      "description": "Get SSL verification status",
+      "category": "ssl",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "ssl_certificate_packs",
+      "method": "GET",
+      "path": "/zones/{zone_id}/ssl/certificate_packs",
+      "description": "List SSL certificate packs",
+      "category": "ssl",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    },
+    {
+      "name": "ssl_universal_settings",
+      "method": "GET",
+      "path": "/zones/{zone_id}/ssl/universal/settings",
+      "description": "Get Universal SSL settings",
+      "category": "ssl",
+      "params": [
+        {
+          "name": "zone_id",
+          "type": "string",
+          "required": true,
+          "location": "path"
+        }
+      ]
+    }
+  ]
+}
+
