@@ -44,16 +44,16 @@ pub enum AnalyticsCommand {
     /// Cache hit/miss statistics
     Cache,
 
-    /// Bandwidth by content type
+    /// Bandwidth by status code
     Bandwidth,
 
-    /// Bot traffic analysis
+    /// Device types and user agents
     Bots,
 
-    /// Firewall events
+    /// Firewall events (Pro+ only)
     Firewall,
 
-    /// Hourly traffic
+    /// Hourly traffic summary
     Hourly,
 
     /// Run a custom GraphQL query
@@ -190,7 +190,7 @@ fn print_bandwidth_response(response: &serde_json::Value) -> Result<()> {
         .and_then(|z| z.get("httpRequestsAdaptiveGroups"))
         .and_then(|g| g.as_array())
     {
-        output::table_header(&["BYTES", "CONTENT TYPE"]);
+        output::table_header(&["BYTES", "STATUS"]);
 
         for group in groups {
             let bytes = group
@@ -199,14 +199,15 @@ fn print_bandwidth_response(response: &serde_json::Value) -> Result<()> {
                 .and_then(|b| b.as_u64())
                 .unwrap_or(0);
 
-            let content_type = group
+            let status = group
                 .get("dimensions")
-                .and_then(|d| d.get("edgeResponseContentTypeName"))
-                .and_then(|c| c.as_str())
-                .unwrap_or("-");
+                .and_then(|d| d.get("edgeResponseStatus"))
+                .and_then(|c| c.as_u64())
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| "-".to_string());
 
             let formatted = format_bytes(bytes);
-            println!("{}\t{}", formatted, content_type);
+            println!("{}\t{}", formatted, status);
         }
     }
 

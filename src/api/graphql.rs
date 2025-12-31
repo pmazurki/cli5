@@ -71,13 +71,13 @@ pub fn top_urls_query(zone_id: &str, since: &str, limit: u32) -> String {
     )
 }
 
-/// Build query for top IPs
+/// Build query for top IPs (Free plan compatible)
 pub fn top_ips_query(zone_id: &str, since: &str, limit: u32) -> String {
     http_requests_query(
         zone_id,
         since,
         limit,
-        &["clientIP", "clientCountryName", "clientASNDescription"],
+        &["clientIP", "clientCountryName"],
         "count_DESC",
         None,
     )
@@ -95,13 +95,13 @@ pub fn top_countries_query(zone_id: &str, since: &str, limit: u32) -> String {
     )
 }
 
-/// Build query for error responses (4xx, 5xx)
+/// Build query for error responses (4xx, 5xx) - Free plan compatible
 pub fn errors_query(zone_id: &str, since: &str, limit: u32) -> String {
     http_requests_query(
         zone_id,
         since,
         limit,
-        &["edgeResponseStatus", "clientRequestPath", "clientIP"],
+        &["edgeResponseStatus", "clientRequestPath"],
         "count_DESC",
         Some("edgeResponseStatus_geq: 400"),
     )
@@ -112,7 +112,7 @@ pub fn cache_status_query(zone_id: &str, since: &str, limit: u32) -> String {
     http_requests_query(zone_id, since, limit, &["cacheStatus"], "count_DESC", None)
 }
 
-/// Build query for bandwidth by content type
+/// Build query for bandwidth by status code (Free plan compatible)
 pub fn bandwidth_query(zone_id: &str, since: &str, limit: u32) -> String {
     format!(
         r#"{{
@@ -127,7 +127,7 @@ pub fn bandwidth_query(zone_id: &str, since: &str, limit: u32) -> String {
           edgeResponseBytes
         }}
         dimensions {{
-          edgeResponseContentTypeName
+          edgeResponseStatus
         }}
       }}
     }}
@@ -136,15 +136,15 @@ pub fn bandwidth_query(zone_id: &str, since: &str, limit: u32) -> String {
     )
 }
 
-/// Build query for bots
+/// Build query for bots/device types (Free plan compatible)
 pub fn bots_query(zone_id: &str, since: &str, limit: u32) -> String {
     http_requests_query(
         zone_id,
         since,
         limit,
-        &["clientDeviceType", "botScoreSrcName"],
+        &["clientDeviceType", "userAgent"],
         "count_DESC",
-        Some("botScore_leq: 30"),
+        None,
     )
 }
 
