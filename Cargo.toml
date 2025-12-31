@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Pawel Mazz <pmazurki@me.com>"]
 description = "Modern Cloudflare CLI - REST & GraphQL API client"
 license = "MIT"
-repository = "https://github.com/yourname/cli5"
+repository = "https://github.com/pmazurki/cli5"
 keywords = ["cloudflare", "cli", "api", "graphql"]
 categories = ["command-line-utilities", "web-programming"]
 

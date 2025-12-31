@@ -19,24 +19,24 @@ Download the latest release for your platform:
 
 ```bash
 # macOS ARM64 (Apple Silicon)
-curl -L https://github.com/YOUR_USERNAME/cli5/releases/latest/download/cli5-macos-arm64 -o cli5
+curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-macos-arm64 -o cli5
 chmod +x cli5
 sudo mv cli5 /usr/local/bin/
 
 # macOS x86_64 (Intel)
-curl -L https://github.com/YOUR_USERNAME/cli5/releases/latest/download/cli5-macos-x86_64 -o cli5
+curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-macos-x86_64 -o cli5
 
 # Linux x86_64
-curl -L https://github.com/YOUR_USERNAME/cli5/releases/latest/download/cli5-linux-x86_64 -o cli5
+curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-linux-x86_64 -o cli5
 
 # Linux ARM64
-curl -L https://github.com/YOUR_USERNAME/cli5/releases/latest/download/cli5-linux-arm64 -o cli5
+curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-linux-arm64 -o cli5
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cli5.git
+git clone https://github.com/pmazurki/cli5.git
 cd cli5
 cargo build --release
 cp target/release/cli5 ~/.local/bin/
