@@ -13,14 +13,14 @@ env:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
+    name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: aarch64-apple-darwin
-            os: macos-latest
+            os: macos-14
             name: cli5-macos-arm64
           - target: x86_64-apple-darwin
             os: macos-13
@@ -68,20 +68,20 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
+    if: ${{ always() && contains(needs.build.result, 'success') }}
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
+      - name: List artifacts
+        run: find artifacts -type f
+
       - name: Create checksums
         run: |
           cd artifacts
-          for dir in */; do
-            for file in "$dir"*; do
-              sha256sum "$file" >> checksums.txt
-            done
-          done
+          find . -type f -name "cli5-*" -exec sha256sum {} \; > checksums.txt
           cat checksums.txt
 
       - name: Release
@@ -91,3 +91,4 @@ jobs:
             artifacts/*/cli5-*
             artifacts/checksums.txt
           generate_release_notes: true
+          fail_on_unmatched_files: false
