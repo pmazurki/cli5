@@ -11,6 +11,7 @@ pub mod raw;
 pub mod settings;
 pub mod ssl;
 pub mod storage;
+pub mod tunnel;
 pub mod workers;
 pub mod zones;
 
@@ -70,6 +71,9 @@ pub enum Commands {
 
     /// Storage & Databases - KV, D1, R2, Queues, Vectorize
     Storage(storage::StorageArgs),
+
+    /// Cloudflare Tunnel - secure connections to your infrastructure
+    Tunnel(tunnel::TunnelArgs),
 
     /// Raw API requests
     Raw(raw::RawArgs),

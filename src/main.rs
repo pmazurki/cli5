@@ -44,6 +44,7 @@ async fn main() -> Result<()> {
         Commands::Pages(args) => cli::pages::execute(&config, args).await,
         Commands::Ai(args) => cli::ai::execute(&config, args).await,
         Commands::Storage(args) => cli::storage::execute(&config, args).await,
+        Commands::Tunnel(args) => cli::tunnel::execute(&config, args).await,
         Commands::Raw(args) => cli::raw::execute(&config, args).await,
         Commands::Config(args) => cli::config_cmd::execute(&config, args).await,
     }

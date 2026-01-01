@@ -12,6 +12,7 @@ Modern Cloudflare CLI written in Rust. Supports both REST API and GraphQL Analyt
 - 📄 **Pages** - Manage Cloudflare Pages projects
 - 🤖 **AI** - Chat with Cloudflare Workers AI (Llama, Mistral)
 - 💾 **Storage** - KV, D1, Queues, Vectorize, Hyperdrive, R2
+- 🚇 **Tunnels** - Create, manage and run Cloudflare Tunnels
 - 🎨 **Colored output** - Beautiful terminal formatting
 - 📦 **Modular** - Endpoints defined in JSON files
 - 🌍 **Cross-platform** - Linux, macOS (x86_64 & ARM64)
@@ -226,6 +227,45 @@ cli5 storage hyperdrive delete CONFIG_ID
 cli5 storage r2 list
 cli5 storage r2 create my-bucket
 cli5 storage r2 delete my-bucket
+```
+
+### Tunnels
+
+```bash
+# Check cloudflared status
+cli5 tunnel status
+
+# Install cloudflared client
+cli5 tunnel install-client
+
+# List tunnels
+cli5 tunnel list
+
+# Create tunnel
+cli5 tunnel create my-tunnel
+
+# Get token
+cli5 tunnel token TUNNEL_ID
+
+# Run tunnel (foreground)
+cli5 tunnel run TUNNEL_ID
+
+# Run tunnel (background)
+cli5 tunnel run TUNNEL_ID --background
+
+# Stop tunnel
+cli5 tunnel stop
+
+# Routes management
+cli5 tunnel routes
+cli5 tunnel add-route 192.168.1.0/24 --tunnel TUNNEL_ID --comment "Home LAN"
+
+# Virtual networks
+cli5 tunnel vnets
+cli5 tunnel create-vnet my-vnet --default
+
+# Delete tunnel
+cli5 tunnel delete TUNNEL_ID
 ```
 
 ### Analytics (GraphQL)
