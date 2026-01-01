@@ -256,4 +256,3 @@ pub async fn execute(config: &Config, args: SettingsArgs) -> Result<()> {
 
     Ok(())
 }
-

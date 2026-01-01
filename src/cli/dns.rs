@@ -233,4 +233,3 @@ pub async fn execute(config: &Config, args: DnsArgs) -> Result<()> {
 
     Ok(())
 }
-

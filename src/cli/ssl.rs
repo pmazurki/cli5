@@ -111,7 +111,9 @@ pub async fn execute(config: &Config, args: SslArgs) -> Result<()> {
         SslCommand::MinTls { version } => {
             let valid = ["1.0", "1.1", "1.2", "1.3"];
             if !valid.contains(&version.as_str()) {
-                return Err(anyhow::anyhow!("Invalid TLS version. Use: 1.0, 1.1, 1.2, 1.3"));
+                return Err(anyhow::anyhow!(
+                    "Invalid TLS version. Use: 1.0, 1.1, 1.2, 1.3"
+                ));
             }
 
             set_setting(&client, &zone_id, "min_tls_version", &version).await?;
@@ -141,10 +143,7 @@ pub async fn execute(config: &Config, args: SslArgs) -> Result<()> {
                     if let Some(certificates) = pack.get("certificates").and_then(|c| c.as_array())
                     {
                         for cert in certificates {
-                            let status = cert
-                                .get("status")
-                                .and_then(|s| s.as_str())
-                                .unwrap_or("-");
+                            let status = cert.get("status").and_then(|s| s.as_str()).unwrap_or("-");
                             let hosts = cert
                                 .get("hosts")
                                 .and_then(|h| h.as_array())
@@ -155,10 +154,7 @@ pub async fn execute(config: &Config, args: SslArgs) -> Result<()> {
                                         .join(", ")
                                 })
                                 .unwrap_or_else(|| "-".to_string());
-                            let issuer = cert
-                                .get("issuer")
-                                .and_then(|i| i.as_str())
-                                .unwrap_or("-");
+                            let issuer = cert.get("issuer").and_then(|i| i.as_str()).unwrap_or("-");
                             let expires = cert
                                 .get("expires_on")
                                 .and_then(|e| e.as_str())
@@ -248,4 +244,3 @@ fn format_on_off(state: &str) -> String {
         _ => state.to_string(),
     }
 }
-

@@ -183,7 +183,7 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
             let tunnel_id = resolve_tunnel_id(&client, &account_id, &tunnel).await?;
             let path = format!("/accounts/{}/cfd_tunnel/{}/token", account_id, tunnel_id);
             let response = client.get_raw(&path).await?;
-            
+
             if let Some(token) = response.get("result").and_then(|r| r.as_str()) {
                 run_tunnel(token, background).await?;
             } else {
@@ -200,7 +200,10 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
         }
 
         TunnelCommand::Config { tunnel_id } => {
-            let path = format!("/accounts/{}/cfd_tunnel/{}/configurations", account_id, tunnel_id);
+            let path = format!(
+                "/accounts/{}/cfd_tunnel/{}/configurations",
+                account_id, tunnel_id
+            );
             let response = client.get_raw(&path).await?;
             if let Some(result) = response.get("result") {
                 println!("{}", serde_json::to_string_pretty(result)?);
@@ -213,7 +216,11 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
             print_routes(&response);
         }
 
-        TunnelCommand::AddRoute { cidr, tunnel, comment } => {
+        TunnelCommand::AddRoute {
+            cidr,
+            tunnel,
+            comment,
+        } => {
             let path = format!("/accounts/{}/teamnet/routes", account_id);
             let mut body = json!({
                 "network": cidr,
@@ -223,7 +230,11 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
                 body["comment"] = json!(c);
             }
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Route {} added to tunnel!", cidr));
             }
         }
@@ -240,7 +251,11 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
             print_vnets(&response);
         }
 
-        TunnelCommand::CreateVnet { name, comment, default } => {
+        TunnelCommand::CreateVnet {
+            name,
+            comment,
+            default,
+        } => {
             let path = format!("/accounts/{}/teamnet/virtual_networks", account_id);
             let mut body = json!({
                 "name": name,
@@ -250,13 +265,20 @@ pub async fn execute(config: &Config, args: TunnelArgs) -> Result<()> {
                 body["comment"] = json!(c);
             }
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Virtual network '{}' created!", name));
             }
         }
 
         TunnelCommand::DeleteVnet { vnet_id } => {
-            let path = format!("/accounts/{}/teamnet/virtual_networks/{}", account_id, vnet_id);
+            let path = format!(
+                "/accounts/{}/teamnet/virtual_networks/{}",
+                account_id, vnet_id
+            );
             client.delete_raw(&path).await?;
             output::success("Virtual network deleted!");
         }
@@ -279,40 +301,40 @@ fn generate_tunnel_secret() -> String {
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_nanos();
-    
+
     // Base64 encoded 32-byte secret
     let secret_bytes: Vec<u8> = (0..32)
         .map(|i| ((timestamp >> (i % 16)) & 0xFF) as u8 ^ (i as u8 * 17))
         .collect();
-    
+
     base64_encode(&secret_bytes)
 }
 
 fn base64_encode(data: &[u8]) -> String {
     const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut result = String::new();
-    
+
     for chunk in data.chunks(3) {
         let b0 = chunk[0] as usize;
         let b1 = chunk.get(1).copied().unwrap_or(0) as usize;
         let b2 = chunk.get(2).copied().unwrap_or(0) as usize;
-        
+
         result.push(ALPHABET[b0 >> 2] as char);
         result.push(ALPHABET[((b0 & 0x03) << 4) | (b1 >> 4)] as char);
-        
+
         if chunk.len() > 1 {
             result.push(ALPHABET[((b1 & 0x0F) << 2) | (b2 >> 6)] as char);
         } else {
             result.push('=');
         }
-        
+
         if chunk.len() > 2 {
             result.push(ALPHABET[b2 & 0x3F] as char);
         } else {
             result.push('=');
         }
     }
-    
+
     result
 }
 
@@ -327,19 +349,27 @@ fn print_tunnels(response: &serde_json::Value) {
                 let name = t.get("name").and_then(|n| n.as_str()).unwrap_or("-");
                 let id = t.get("id").and_then(|i| i.as_str()).unwrap_or("-");
                 let status = t.get("status").and_then(|s| s.as_str()).unwrap_or("-");
-                let conns = t.get("connections")
+                let conns = t
+                    .get("connections")
                     .and_then(|c| c.as_array())
                     .map(|a| a.len())
                     .unwrap_or(0);
-                
+
                 let status_icon = match status {
                     "healthy" => "🟢",
                     "degraded" => "🟡",
                     "inactive" => "⚫",
                     _ => "⚪",
                 };
-                
-                println!("{}\t{}\t{} {}\t{}", name, &id[..8], status_icon, status, conns);
+
+                println!(
+                    "{}\t{}\t{} {}\t{}",
+                    name,
+                    &id[..8],
+                    status_icon,
+                    status,
+                    conns
+                );
             }
             output::info(&format!("Total: {} tunnels", tunnels.len()));
         }
@@ -371,9 +401,18 @@ fn print_vnets(response: &serde_json::Value) {
             for v in vnets {
                 let name = v.get("name").and_then(|n| n.as_str()).unwrap_or("-");
                 let id = v.get("id").and_then(|i| i.as_str()).unwrap_or("-");
-                let is_default = v.get("is_default_network").and_then(|d| d.as_bool()).unwrap_or(false);
+                let is_default = v
+                    .get("is_default_network")
+                    .and_then(|d| d.as_bool())
+                    .unwrap_or(false);
                 let comment = v.get("comment").and_then(|c| c.as_str()).unwrap_or("-");
-                println!("{}\t{}\t{}\t{}", name, &id[..8], if is_default { "✅" } else { "" }, comment);
+                println!(
+                    "{}\t{}\t{}\t{}",
+                    name,
+                    &id[..8],
+                    if is_default { "✅" } else { "" },
+                    comment
+                );
             }
         }
     }
@@ -409,16 +448,23 @@ async fn get_account_id(client: &CloudflareClient) -> Result<String> {
     Err(anyhow::anyhow!("Could not determine account ID"))
 }
 
-async fn resolve_tunnel_id(client: &CloudflareClient, account_id: &str, tunnel: &str) -> Result<String> {
+async fn resolve_tunnel_id(
+    client: &CloudflareClient,
+    account_id: &str,
+    tunnel: &str,
+) -> Result<String> {
     // If it looks like a UUID, use it directly
     if tunnel.contains('-') && tunnel.len() > 30 {
         return Ok(tunnel.to_string());
     }
-    
+
     // Otherwise, search by name
-    let path = format!("/accounts/{}/cfd_tunnel?name={}&is_deleted=false", account_id, tunnel);
+    let path = format!(
+        "/accounts/{}/cfd_tunnel?name={}&is_deleted=false",
+        account_id, tunnel
+    );
     let response = client.get_raw(&path).await?;
-    
+
     if let Some(tunnels) = response.get("result").and_then(|r| r.as_array()) {
         if let Some(t) = tunnels.first() {
             if let Some(id) = t.get("id").and_then(|i| i.as_str()) {
@@ -426,7 +472,7 @@ async fn resolve_tunnel_id(client: &CloudflareClient, account_id: &str, tunnel: 
             }
         }
     }
-    
+
     Err(anyhow::anyhow!("Tunnel '{}' not found", tunnel))
 }
 
@@ -436,18 +482,24 @@ fn get_cloudflared_path() -> Option<std::path::PathBuf> {
         "/usr/local/bin/cloudflared",
         "/usr/bin/cloudflared",
         "/opt/homebrew/bin/cloudflared",
-        &format!("{}/.local/bin/cloudflared", std::env::var("HOME").unwrap_or_default()),
+        &format!(
+            "{}/.local/bin/cloudflared",
+            std::env::var("HOME").unwrap_or_default()
+        ),
     ];
-    
+
     for p in paths {
         let path = std::path::PathBuf::from(p);
         if path.exists() {
             return Some(path);
         }
     }
-    
+
     // Try PATH
-    if let Ok(output) = std::process::Command::new("which").arg("cloudflared").output() {
+    if let Ok(output) = std::process::Command::new("which")
+        .arg("cloudflared")
+        .output()
+    {
         if output.status.success() {
             let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
             if !path_str.is_empty() {
@@ -455,7 +507,7 @@ fn get_cloudflared_path() -> Option<std::path::PathBuf> {
             }
         }
     }
-    
+
     None
 }
 
@@ -465,12 +517,12 @@ async fn install_cloudflared() -> Result<()> {
         show_client_status().await?;
         return Ok(());
     }
-    
+
     let os = std::env::consts::OS;
     let arch = std::env::consts::ARCH;
-    
+
     output::info(&format!("Installing cloudflared for {}/{}", os, arch));
-    
+
     let (url, install_cmd) = match (os, arch) {
         ("macos", _) => {
             println!("Run: brew install cloudflared");
@@ -490,35 +542,38 @@ async fn install_cloudflared() -> Result<()> {
             return Ok(());
         }
     };
-    
+
     println!("\n📥 Download:");
     println!("curl -L {} -o cloudflared", url);
     println!("\n📦 Install:");
     println!("{}", install_cmd.join(" "));
-    
+
     Ok(())
 }
 
 async fn run_tunnel(token: &str, background: bool) -> Result<()> {
     let cloudflared = get_cloudflared_path()
         .ok_or_else(|| anyhow::anyhow!("cloudflared not found. Run: cli5 tunnel install-client"))?;
-    
+
     output::info(&format!("Starting tunnel with {}", cloudflared.display()));
-    
+
     let mut cmd = std::process::Command::new(&cloudflared);
     cmd.args(["tunnel", "run", "--token", token]);
-    
+
     if background {
         cmd.stdout(std::process::Stdio::null());
         cmd.stderr(std::process::Stdio::null());
-        
+
         let child = cmd.spawn()?;
-        
+
         // Save PID for later
         let pid_file = get_pid_file();
         std::fs::write(&pid_file, child.id().to_string())?;
-        
-        output::success(&format!("Tunnel started in background (PID: {})", child.id()));
+
+        output::success(&format!(
+            "Tunnel started in background (PID: {})",
+            child.id()
+        ));
         println!("\nStop with: cli5 tunnel stop");
     } else {
         output::info("Running tunnel (Ctrl+C to stop)...");
@@ -527,22 +582,20 @@ async fn run_tunnel(token: &str, background: bool) -> Result<()> {
             return Err(anyhow::anyhow!("Tunnel exited with: {}", status));
         }
     }
-    
+
     Ok(())
 }
 
 async fn stop_tunnel() -> Result<()> {
     let pid_file = get_pid_file();
-    
+
     if pid_file.exists() {
         let pid_str = std::fs::read_to_string(&pid_file)?;
         let pid = pid_str.trim();
-        
+
         // Kill process using kill command
-        let _ = std::process::Command::new("kill")
-            .arg(pid)
-            .output();
-        
+        let _ = std::process::Command::new("kill").arg(pid).output();
+
         std::fs::remove_file(&pid_file)?;
         output::success(&format!("Tunnel stopped (PID: {})", pid));
     } else {
@@ -550,7 +603,7 @@ async fn stop_tunnel() -> Result<()> {
         let output = std::process::Command::new("pkill")
             .args(["-f", "cloudflared tunnel run"])
             .output();
-        
+
         match output {
             Ok(o) if o.status.success() => {
                 output::success("Tunnel processes stopped");
@@ -560,17 +613,17 @@ async fn stop_tunnel() -> Result<()> {
             }
         }
     }
-    
+
     Ok(())
 }
 
 async fn show_client_status() -> Result<()> {
     println!("\n🔧 Cloudflared Client Status:\n");
-    
+
     // Check if installed
     if let Some(path) = get_cloudflared_path() {
         println!("✅ Installed: {}", path.display());
-        
+
         // Get version
         if let Ok(output) = std::process::Command::new(&path).arg("--version").output() {
             let version = String::from_utf8_lossy(&output.stdout);
@@ -581,7 +634,7 @@ async fn show_client_status() -> Result<()> {
         println!("   Run: cli5 tunnel install-client");
         return Ok(());
     }
-    
+
     // Check if running
     let pid_file = get_pid_file();
     if pid_file.exists() {
@@ -601,7 +654,7 @@ async fn show_client_status() -> Result<()> {
             }
         }
     }
-    
+
     Ok(())
 }
 
@@ -609,4 +662,3 @@ fn get_pid_file() -> std::path::PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     std::path::PathBuf::from(home).join(".cloudflared.pid")
 }
-

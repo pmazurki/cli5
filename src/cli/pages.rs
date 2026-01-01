@@ -118,7 +118,11 @@ pub async fn execute(config: &Config, args: PagesArgs) -> Result<()> {
 
             let response = client.post_raw(&path, body).await?;
 
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 let subdomain = response
                     .get("result")
                     .and_then(|r| r.get("subdomain"))
@@ -135,7 +139,10 @@ pub async fn execute(config: &Config, args: PagesArgs) -> Result<()> {
                 let errors = response.get("errors").and_then(|e| e.as_array());
                 if let Some(errs) = errors {
                     for err in errs {
-                        let msg = err.get("message").and_then(|m| m.as_str()).unwrap_or("Unknown error");
+                        let msg = err
+                            .get("message")
+                            .and_then(|m| m.as_str())
+                            .unwrap_or("Unknown error");
                         output::error(msg);
                     }
                 }
@@ -146,7 +153,11 @@ pub async fn execute(config: &Config, args: PagesArgs) -> Result<()> {
             let path = format!("/accounts/{}/pages/projects/{}", account_id, name);
             let response = client.delete_raw(&path).await?;
 
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Pages project '{}' deleted!", name));
             } else {
                 output::error("Failed to delete project");
@@ -154,7 +165,10 @@ pub async fn execute(config: &Config, args: PagesArgs) -> Result<()> {
         }
 
         PagesCommand::Deployments { name } => {
-            let path = format!("/accounts/{}/pages/projects/{}/deployments", account_id, name);
+            let path = format!(
+                "/accounts/{}/pages/projects/{}/deployments",
+                account_id, name
+            );
             let response = client.get_raw(&path).await?;
 
             if let Some(deployments) = response.get("result").and_then(|r| r.as_array()) {
@@ -215,4 +229,3 @@ async fn get_account_id(client: &CloudflareClient) -> Result<String> {
 
     Err(anyhow::anyhow!("Could not determine account ID"))
 }
-

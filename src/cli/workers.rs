@@ -141,20 +141,28 @@ pub async fn execute(config: &Config, args: WorkersArgs) -> Result<()> {
             let path = format!("/accounts/{}/workers/scripts/{}", account_id, name);
 
             // Use service worker format (simpler)
-            let response = client
-                .put_worker_script(&path, &script, false)
-                .await?;
+            let response = client.put_worker_script(&path, &script, false).await?;
 
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Worker '{}' created!", name));
                 println!();
                 println!("To add a route:");
-                println!("  cli5 workers add-route --zone maz.ie --pattern '*.maz.ie/api/*' --script {}", name);
+                println!(
+                    "  cli5 workers add-route --zone maz.ie --pattern '*.maz.ie/api/*' --script {}",
+                    name
+                );
             } else {
                 let errors = response.get("errors").and_then(|e| e.as_array());
                 if let Some(errs) = errors {
                     for err in errs {
-                        let msg = err.get("message").and_then(|m| m.as_str()).unwrap_or("Unknown error");
+                        let msg = err
+                            .get("message")
+                            .and_then(|m| m.as_str())
+                            .unwrap_or("Unknown error");
                         output::error(msg);
                     }
                 }
@@ -165,7 +173,11 @@ pub async fn execute(config: &Config, args: WorkersArgs) -> Result<()> {
             let path = format!("/accounts/{}/workers/scripts/{}", account_id, name);
             let response = client.delete_raw(&path).await?;
 
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Worker '{}' deleted!", name));
             } else {
                 output::error("Failed to delete worker");
@@ -193,7 +205,11 @@ pub async fn execute(config: &Config, args: WorkersArgs) -> Result<()> {
             }
         }
 
-        WorkersCommand::AddRoute { zone, pattern, script } => {
+        WorkersCommand::AddRoute {
+            zone,
+            pattern,
+            script,
+        } => {
             let zone_id = client.resolve_zone_id(&zone).await?;
             let path = format!("/zones/{}/workers/routes", zone_id);
             let body = serde_json::json!({
@@ -203,13 +219,20 @@ pub async fn execute(config: &Config, args: WorkersArgs) -> Result<()> {
 
             let response = client.post_raw(&path, body).await?;
 
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Route '{}' -> '{}' created!", pattern, script));
             } else {
                 let errors = response.get("errors").and_then(|e| e.as_array());
                 if let Some(errs) = errors {
                     for err in errs {
-                        let msg = err.get("message").and_then(|m| m.as_str()).unwrap_or("Unknown error");
+                        let msg = err
+                            .get("message")
+                            .and_then(|m| m.as_str())
+                            .unwrap_or("Unknown error");
                         output::error(msg);
                     }
                 }
@@ -235,4 +258,3 @@ async fn get_account_id(client: &CloudflareClient) -> Result<String> {
 
     Err(anyhow::anyhow!("Could not determine account ID"))
 }
-

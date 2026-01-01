@@ -68,7 +68,11 @@ pub enum KvCommand {
     /// Get value
     Get { namespace_id: String, key: String },
     /// Put value
-    Put { namespace_id: String, key: String, value: String },
+    Put {
+        namespace_id: String,
+        key: String,
+        value: String,
+    },
 }
 
 // ============ D1 Commands ============
@@ -166,8 +170,14 @@ async fn execute_kv(client: &CloudflareClient, account_id: &str, cmd: KvCommand)
             let response = client.get_raw(&path).await?;
             print_list(&response, &["TITLE", "ID"], |item| {
                 vec![
-                    item.get("title").and_then(|t| t.as_str()).unwrap_or("-").to_string(),
-                    item.get("id").and_then(|i| i.as_str()).unwrap_or("-").to_string(),
+                    item.get("title")
+                        .and_then(|t| t.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("id")
+                        .and_then(|i| i.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
@@ -175,35 +185,69 @@ async fn execute_kv(client: &CloudflareClient, account_id: &str, cmd: KvCommand)
             let path = format!("/accounts/{}/storage/kv/namespaces", account_id);
             let body = json!({ "title": title });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
-                let id = response.get("result").and_then(|r| r.get("id")).and_then(|i| i.as_str()).unwrap_or("-");
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
+                let id = response
+                    .get("result")
+                    .and_then(|r| r.get("id"))
+                    .and_then(|i| i.as_str())
+                    .unwrap_or("-");
                 output::success(&format!("KV namespace '{}' created! ID: {}", title, id));
             }
         }
         KvCommand::Delete { namespace_id } => {
-            let path = format!("/accounts/{}/storage/kv/namespaces/{}", account_id, namespace_id);
+            let path = format!(
+                "/accounts/{}/storage/kv/namespaces/{}",
+                account_id, namespace_id
+            );
             client.delete_raw(&path).await?;
             output::success("KV namespace deleted!");
         }
         KvCommand::Keys { namespace_id } => {
-            let path = format!("/accounts/{}/storage/kv/namespaces/{}/keys", account_id, namespace_id);
+            let path = format!(
+                "/accounts/{}/storage/kv/namespaces/{}/keys",
+                account_id, namespace_id
+            );
             let response = client.get_raw(&path).await?;
             print_list(&response, &["KEY", "EXPIRATION"], |item| {
                 vec![
-                    item.get("name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("expiration").and_then(|e| e.as_u64()).map(|e| e.to_string()).unwrap_or("-".to_string()),
+                    item.get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("expiration")
+                        .and_then(|e| e.as_u64())
+                        .map(|e| e.to_string())
+                        .unwrap_or("-".to_string()),
                 ]
             });
         }
         KvCommand::Get { namespace_id, key } => {
-            let path = format!("/accounts/{}/storage/kv/namespaces/{}/values/{}", account_id, namespace_id, key);
+            let path = format!(
+                "/accounts/{}/storage/kv/namespaces/{}/values/{}",
+                account_id, namespace_id, key
+            );
             let response = client.get_raw(&path).await?;
             println!("{}", serde_json::to_string_pretty(&response)?);
         }
-        KvCommand::Put { namespace_id, key, value } => {
-            let path = format!("/accounts/{}/storage/kv/namespaces/{}/values/{}", account_id, namespace_id, key);
+        KvCommand::Put {
+            namespace_id,
+            key,
+            value,
+        } => {
+            let path = format!(
+                "/accounts/{}/storage/kv/namespaces/{}/values/{}",
+                account_id, namespace_id, key
+            );
             let response = client.put_raw(&path, json!(value)).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Key '{}' saved!", key));
             }
         }
@@ -220,9 +264,18 @@ async fn execute_d1(client: &CloudflareClient, account_id: &str, cmd: D1Command)
             let response = client.get_raw(&path).await?;
             print_list(&response, &["NAME", "ID", "VERSION"], |item| {
                 vec![
-                    item.get("name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("uuid").and_then(|i| i.as_str()).unwrap_or("-").to_string(),
-                    item.get("version").and_then(|v| v.as_str()).unwrap_or("-").to_string(),
+                    item.get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("uuid")
+                        .and_then(|i| i.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("version")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
@@ -230,8 +283,16 @@ async fn execute_d1(client: &CloudflareClient, account_id: &str, cmd: D1Command)
             let path = format!("/accounts/{}/d1/database", account_id);
             let body = json!({ "name": name });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
-                let id = response.get("result").and_then(|r| r.get("uuid")).and_then(|i| i.as_str()).unwrap_or("-");
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
+                let id = response
+                    .get("result")
+                    .and_then(|r| r.get("uuid"))
+                    .and_then(|i| i.as_str())
+                    .unwrap_or("-");
                 output::success(&format!("D1 database '{}' created! ID: {}", name, id));
             }
         }
@@ -244,7 +305,10 @@ async fn execute_d1(client: &CloudflareClient, account_id: &str, cmd: D1Command)
             let path = format!("/accounts/{}/d1/database/{}/query", account_id, database_id);
             let body = json!({ "sql": sql });
             let response = client.post_raw(&path, body).await?;
-            println!("{}", serde_json::to_string_pretty(&response.get("result").unwrap_or(&json!({})))?);
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&response.get("result").unwrap_or(&json!({})))?
+            );
         }
     }
     Ok(())
@@ -252,16 +316,30 @@ async fn execute_d1(client: &CloudflareClient, account_id: &str, cmd: D1Command)
 
 // ============ Queues Implementation ============
 
-async fn execute_queues(client: &CloudflareClient, account_id: &str, cmd: QueuesCommand) -> Result<()> {
+async fn execute_queues(
+    client: &CloudflareClient,
+    account_id: &str,
+    cmd: QueuesCommand,
+) -> Result<()> {
     match cmd {
         QueuesCommand::List => {
             let path = format!("/accounts/{}/queues", account_id);
             let response = client.get_raw(&path).await?;
             print_list(&response, &["NAME", "ID", "CREATED"], |item| {
                 vec![
-                    item.get("queue_name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("queue_id").and_then(|i| i.as_str()).unwrap_or("-").to_string(),
-                    item.get("created_on").and_then(|c| c.as_str()).map(|s| s.split('T').next().unwrap_or(s)).unwrap_or("-").to_string(),
+                    item.get("queue_name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("queue_id")
+                        .and_then(|i| i.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("created_on")
+                        .and_then(|c| c.as_str())
+                        .map(|s| s.split('T').next().unwrap_or(s))
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
@@ -269,8 +347,16 @@ async fn execute_queues(client: &CloudflareClient, account_id: &str, cmd: Queues
             let path = format!("/accounts/{}/queues", account_id);
             let body = json!({ "queue_name": name });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
-                let id = response.get("result").and_then(|r| r.get("queue_id")).and_then(|i| i.as_str()).unwrap_or("-");
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
+                let id = response
+                    .get("result")
+                    .and_then(|r| r.get("queue_id"))
+                    .and_then(|i| i.as_str())
+                    .unwrap_or("-");
                 output::success(&format!("Queue '{}' created! ID: {}", name, id));
             }
         }
@@ -285,20 +371,39 @@ async fn execute_queues(client: &CloudflareClient, account_id: &str, cmd: Queues
 
 // ============ Vectorize Implementation ============
 
-async fn execute_vectorize(client: &CloudflareClient, account_id: &str, cmd: VectorizeCommand) -> Result<()> {
+async fn execute_vectorize(
+    client: &CloudflareClient,
+    account_id: &str,
+    cmd: VectorizeCommand,
+) -> Result<()> {
     match cmd {
         VectorizeCommand::List => {
             let path = format!("/accounts/{}/vectorize/indexes", account_id);
             let response = client.get_raw(&path).await?;
             print_list(&response, &["NAME", "DIMENSIONS", "METRIC"], |item| {
                 vec![
-                    item.get("name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("config").and_then(|c| c.get("dimensions")).and_then(|d| d.as_u64()).map(|d| d.to_string()).unwrap_or("-".to_string()),
-                    item.get("config").and_then(|c| c.get("metric")).and_then(|m| m.as_str()).unwrap_or("-").to_string(),
+                    item.get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("config")
+                        .and_then(|c| c.get("dimensions"))
+                        .and_then(|d| d.as_u64())
+                        .map(|d| d.to_string())
+                        .unwrap_or("-".to_string()),
+                    item.get("config")
+                        .and_then(|c| c.get("metric"))
+                        .and_then(|m| m.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
-        VectorizeCommand::Create { name, dimensions, metric } => {
+        VectorizeCommand::Create {
+            name,
+            dimensions,
+            metric,
+        } => {
             let path = format!("/accounts/{}/vectorize/indexes", account_id);
             let body = json!({
                 "name": name,
@@ -308,7 +413,11 @@ async fn execute_vectorize(client: &CloudflareClient, account_id: &str, cmd: Vec
                 }
             });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("Vectorize index '{}' created!", name));
             }
         }
@@ -323,19 +432,32 @@ async fn execute_vectorize(client: &CloudflareClient, account_id: &str, cmd: Vec
 
 // ============ Hyperdrive Implementation ============
 
-async fn execute_hyperdrive(client: &CloudflareClient, account_id: &str, cmd: HyperdriveCommand) -> Result<()> {
+async fn execute_hyperdrive(
+    client: &CloudflareClient,
+    account_id: &str,
+    cmd: HyperdriveCommand,
+) -> Result<()> {
     match cmd {
         HyperdriveCommand::List => {
             let path = format!("/accounts/{}/hyperdrive/configs", account_id);
             let response = client.get_raw(&path).await?;
             print_list(&response, &["NAME", "ID"], |item| {
                 vec![
-                    item.get("name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("id").and_then(|i| i.as_str()).unwrap_or("-").to_string(),
+                    item.get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("id")
+                        .and_then(|i| i.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
-        HyperdriveCommand::Create { name, connection_string } => {
+        HyperdriveCommand::Create {
+            name,
+            connection_string,
+        } => {
             // Parse connection string: postgres://user:pass@host:port/database
             let path = format!("/accounts/{}/hyperdrive/configs", account_id);
             let body = json!({
@@ -345,8 +467,16 @@ async fn execute_hyperdrive(client: &CloudflareClient, account_id: &str, cmd: Hy
                 }
             });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
-                let id = response.get("result").and_then(|r| r.get("id")).and_then(|i| i.as_str()).unwrap_or("-");
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
+                let id = response
+                    .get("result")
+                    .and_then(|r| r.get("id"))
+                    .and_then(|i| i.as_str())
+                    .unwrap_or("-");
                 output::success(&format!("Hyperdrive config '{}' created! ID: {}", name, id));
             }
         }
@@ -368,8 +498,15 @@ async fn execute_r2(client: &CloudflareClient, account_id: &str, cmd: R2Command)
             let response = client.get_raw(&path).await?;
             print_list(&response, &["NAME", "CREATED"], |item| {
                 vec![
-                    item.get("name").and_then(|n| n.as_str()).unwrap_or("-").to_string(),
-                    item.get("creation_date").and_then(|c| c.as_str()).map(|s| s.split('T').next().unwrap_or(s)).unwrap_or("-").to_string(),
+                    item.get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or("-")
+                        .to_string(),
+                    item.get("creation_date")
+                        .and_then(|c| c.as_str())
+                        .map(|s| s.split('T').next().unwrap_or(s))
+                        .unwrap_or("-")
+                        .to_string(),
                 ]
             });
         }
@@ -377,7 +514,11 @@ async fn execute_r2(client: &CloudflareClient, account_id: &str, cmd: R2Command)
             let path = format!("/accounts/{}/r2/buckets", account_id);
             let body = json!({ "name": name });
             let response = client.post_raw(&path, body).await?;
-            if response.get("success").and_then(|s| s.as_bool()).unwrap_or(false) {
+            if response
+                .get("success")
+                .and_then(|s| s.as_bool())
+                .unwrap_or(false)
+            {
                 output::success(&format!("R2 bucket '{}' created!", name));
             }
         }
@@ -423,4 +564,3 @@ where
         }
     }
 }
-

@@ -68,7 +68,8 @@ impl CloudflareClient {
         Ok(api_response)
     }
 
-    /// Make a POST request to the API
+    /// Make a POST request to the API (typed response)
+    #[allow(dead_code)]
     pub async fn post<T: DeserializeOwned>(
         &self,
         path: &str,
@@ -105,7 +106,8 @@ impl CloudflareClient {
         Ok(api_response)
     }
 
-    /// Make a PATCH request to the API
+    /// Make a PATCH request to the API (typed response)
+    #[allow(dead_code)]
     pub async fn patch<T: DeserializeOwned>(
         &self,
         path: &str,
@@ -142,7 +144,8 @@ impl CloudflareClient {
         Ok(api_response)
     }
 
-    /// Make a PUT request to the API
+    /// Make a PUT request to the API (typed response)
+    #[allow(dead_code)]
     pub async fn put<T: DeserializeOwned>(
         &self,
         path: &str,
@@ -179,7 +182,8 @@ impl CloudflareClient {
         Ok(api_response)
     }
 
-    /// Make a DELETE request to the API
+    /// Make a DELETE request to the API (typed response)
+    #[allow(dead_code)]
     pub async fn delete<T: DeserializeOwned>(&self, path: &str) -> Result<ApiResponse<T>> {
         let url = format!("{}{}", CF_API_BASE, path);
         debug!("DELETE {}", url);
@@ -311,7 +315,12 @@ impl CloudflareClient {
     }
 
     /// Upload a Worker script (ES modules format)
-    pub async fn put_worker_script(&self, path: &str, script: &str, es_modules: bool) -> Result<Value> {
+    pub async fn put_worker_script(
+        &self,
+        path: &str,
+        script: &str,
+        es_modules: bool,
+    ) -> Result<Value> {
         let url = format!("{}{}", CF_API_BASE, path);
         debug!("PUT worker script to {}", url);
 
@@ -332,8 +341,14 @@ impl CloudflareClient {
             });
 
             let form = Form::new()
-                .part("metadata", Part::text(metadata.to_string()).mime_str("application/json")?)
-                .part("worker.js", Part::text(script.to_string()).mime_str("application/javascript+module")?);
+                .part(
+                    "metadata",
+                    Part::text(metadata.to_string()).mime_str("application/json")?,
+                )
+                .part(
+                    "worker.js",
+                    Part::text(script.to_string()).mime_str("application/javascript+module")?,
+                );
 
             req = req.multipart(form);
         } else {
