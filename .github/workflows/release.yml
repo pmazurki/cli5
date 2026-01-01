@@ -32,6 +32,9 @@ jobs:
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             name: cli5-linux-arm64
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: cli5-windows-x86_64
 
     steps:
       - uses: actions/checkout@v4
@@ -54,10 +57,15 @@ jobs:
         run: cross build --release --target ${{ matrix.target }}
 
       - name: Prepare binary
+        shell: bash
         run: |
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/cli5 dist/${{ matrix.name }}
-          chmod +x dist/${{ matrix.name }}
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            cp target/${{ matrix.target }}/release/cli5.exe dist/${{ matrix.name }}.exe
+          else
+            cp target/${{ matrix.target }}/release/cli5 dist/${{ matrix.name }}
+            chmod +x dist/${{ matrix.name }}
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

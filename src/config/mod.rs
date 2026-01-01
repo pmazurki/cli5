@@ -39,16 +39,24 @@ pub enum OutputFormat {
 impl Config {
     /// Load configuration from environment variables
     pub fn load() -> Result<Self> {
-        let api_token = env::var("CF_API_TOKEN").ok();
-        let api_key = env::var("CF_API_KEY").ok();
-        let api_email = env::var("CF_API_EMAIL").ok();
+        let config = Self::load_optional();
 
         // Require at least one auth method
-        if api_token.is_none() && (api_key.is_none() || api_email.is_none()) {
+        if config.api_token.is_none() && (config.api_key.is_none() || config.api_email.is_none()) {
             return Err(anyhow!(
                 "Authentication required. Set CF_API_TOKEN or both CF_API_KEY and CF_API_EMAIL"
             ));
         }
+
+        Ok(config)
+    }
+
+    /// Load configuration without requiring authentication
+    /// Useful for commands that can work with just a tunnel token
+    pub fn load_optional() -> Self {
+        let api_token = env::var("CF_API_TOKEN").ok();
+        let api_key = env::var("CF_API_KEY").ok();
+        let api_email = env::var("CF_API_EMAIL").ok();
 
         let output_format = match env::var("CF_OUTPUT_FORMAT")
             .unwrap_or_default()
@@ -60,14 +68,14 @@ impl Config {
             _ => OutputFormat::Table,
         };
 
-        Ok(Self {
+        Self {
             api_token,
             api_key,
             api_email,
             zone_id: env::var("CF_ZONE_ID").ok(),
             zone_name: env::var("CF_ZONE_NAME").ok(),
             output_format,
-        })
+        }
     }
 
     /// Get the authentication headers for API requests

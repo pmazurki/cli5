@@ -15,7 +15,7 @@ Modern Cloudflare CLI written in Rust. Supports both REST API and GraphQL Analyt
 - 🚇 **Tunnels** - Create, manage and run Cloudflare Tunnels
 - 🎨 **Colored output** - Beautiful terminal formatting
 - 📦 **Modular** - Endpoints defined in JSON files
-- 🌍 **Cross-platform** - Linux, macOS (x86_64 & ARM64)
+- 🌍 **Cross-platform** - Linux, macOS, Windows (x86_64 & ARM64)
 
 ## Installation
 
@@ -23,6 +23,7 @@ Modern Cloudflare CLI written in Rust. Supports both REST API and GraphQL Analyt
 
 Download the latest release for your platform:
 
+**macOS:**
 ```bash
 # macOS ARM64 (Apple Silicon)
 curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-macos-arm64 -o cli5
@@ -31,13 +32,36 @@ sudo mv cli5 /usr/local/bin/
 
 # macOS x86_64 (Intel)
 curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-macos-x86_64 -o cli5
+chmod +x cli5
+sudo mv cli5 /usr/local/bin/
+```
 
+**Linux:**
+```bash
 # Linux x86_64
 curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-linux-x86_64 -o cli5
+chmod +x cli5
+sudo mv cli5 /usr/local/bin/
 
 # Linux ARM64
 curl -L https://github.com/pmazurki/cli5/releases/latest/download/cli5-linux-arm64 -o cli5
+chmod +x cli5
+sudo mv cli5 /usr/local/bin/
 ```
+
+**Windows:**
+```powershell
+# PowerShell - Automatyczna instalacja
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pmazurki/cli5/main/install-windows.ps1" -OutFile install-windows.ps1
+.\install-windows.ps1
+
+# Lub ręcznie:
+# 1. Pobierz cli5-windows-x86_64.exe z Releases
+# 2. Zmień nazwę na cli5.exe
+# 3. Dodaj do PATH
+```
+
+📖 **Szczegółowe instrukcje Windows:** [WINDOWS.md](WINDOWS.md)
 
 ### From Source
 

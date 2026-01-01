@@ -152,7 +152,7 @@ pub async fn execute(config: &Config, args: WorkersArgs) -> Result<()> {
                 println!();
                 println!("To add a route:");
                 println!(
-                    "  cli5 workers add-route --zone maz.ie --pattern '*.maz.ie/api/*' --script {}",
+                    "  cli5 workers add-route --zone example.com --pattern '*.example.com/api/*' --script {}",
                     name
                 );
             } else {
