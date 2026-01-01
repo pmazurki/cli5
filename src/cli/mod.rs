@@ -10,6 +10,7 @@ pub mod pages;
 pub mod raw;
 pub mod settings;
 pub mod ssl;
+pub mod storage;
 pub mod workers;
 pub mod zones;
 
@@ -66,6 +67,9 @@ pub enum Commands {
 
     /// Workers AI - chat, translate, summarize
     Ai(ai::AiArgs),
+
+    /// Storage & Databases - KV, D1, R2, Queues, Vectorize
+    Storage(storage::StorageArgs),
 
     /// Raw API requests
     Raw(raw::RawArgs),

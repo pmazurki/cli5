@@ -11,6 +11,7 @@ Modern Cloudflare CLI written in Rust. Supports both REST API and GraphQL Analyt
 - 👷 **Workers** - Create, deploy and manage Cloudflare Workers
 - 📄 **Pages** - Manage Cloudflare Pages projects
 - 🤖 **AI** - Chat with Cloudflare Workers AI (Llama, Mistral)
+- 💾 **Storage** - KV, D1, Queues, Vectorize, Hyperdrive, R2
 - 🎨 **Colored output** - Beautiful terminal formatting
 - 📦 **Modular** - Endpoints defined in JSON files
 - 🌍 **Cross-platform** - Linux, macOS (x86_64 & ARM64)
@@ -186,6 +187,45 @@ cli5 ai summarize "Long text to summarize..."
 
 # List available models
 cli5 ai models
+```
+
+### Storage & Databases
+
+```bash
+# Workers KV - Key-Value storage
+cli5 storage kv list
+cli5 storage kv create my-kv
+cli5 storage kv keys NAMESPACE_ID
+cli5 storage kv put NAMESPACE_ID mykey "myvalue"
+cli5 storage kv get NAMESPACE_ID mykey
+cli5 storage kv delete NAMESPACE_ID
+
+# D1 - SQLite at the edge
+cli5 storage d1 list
+cli5 storage d1 create my-database
+cli5 storage d1 query DATABASE_ID "SELECT * FROM users"
+cli5 storage d1 query DATABASE_ID "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
+cli5 storage d1 delete DATABASE_ID
+
+# Queues (requires paid plan)
+cli5 storage queues list
+cli5 storage queues create my-queue
+cli5 storage queues delete QUEUE_ID
+
+# Vectorize - Vector database for AI
+cli5 storage vectorize list
+cli5 storage vectorize create my-index --dimensions 768 --metric cosine
+cli5 storage vectorize delete my-index
+
+# Hyperdrive - Database connection pooling
+cli5 storage hyperdrive list
+cli5 storage hyperdrive create my-config --connection-string "postgres://user:pass@host/db"
+cli5 storage hyperdrive delete CONFIG_ID
+
+# R2 - Object storage (requires dashboard activation)
+cli5 storage r2 list
+cli5 storage r2 create my-bucket
+cli5 storage r2 delete my-bucket
 ```
 
 ### Analytics (GraphQL)
