@@ -88,18 +88,18 @@ jobs:
       - name: List artifacts
         run: find artifacts -type f
 
-      - name: Create checksums
+      - name: Prepare release files
         run: |
-          cd artifacts
-          find . -type f \( -name "cli5-*" -o -name "cli5-*.exe" \) -exec sha256sum {} \; > checksums.txt
+          mkdir -p release
+          find artifacts -type f \( -name "cli5-*" -o -name "cli5-*.exe" \) -exec cp {} release/ \;
+          cd release
+          sha256sum cli5-* > checksums.txt
           cat checksums.txt
+          ls -lh
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/*/cli5-*
-            artifacts/*/cli5-*.exe
-            artifacts/checksums.txt
+          files: release/*
           generate_release_notes: true
           fail_on_unmatched_files: false
