@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          path: dist/${{ matrix.name }}
+          path: dist/
 
   release:
     name: Create Release
@@ -90,7 +90,7 @@ jobs:
       - name: Create checksums
         run: |
           cd artifacts
-          find . -type f -name "cli5-*" -exec sha256sum {} \; > checksums.txt
+          find . -type f \( -name "cli5-*" -o -name "cli5-*.exe" \) -exec sha256sum {} \; > checksums.txt
           cat checksums.txt
 
       - name: Release
@@ -98,6 +98,7 @@ jobs:
         with:
           files: |
             artifacts/*/cli5-*
+            artifacts/*/cli5-*.exe
             artifacts/checksums.txt
           generate_release_notes: true
           fail_on_unmatched_files: false
